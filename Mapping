@@ -1,0 +1,49 @@
+####################################################
+#                                                  #
+#                  COPADS                          #
+#                map creation                      #
+#                                                  #
+####################################################
+
+## Necessary Libraries ##
+library(maptools)
+library(raster)
+library(sp)
+library(mapdata)
+library(mapproj)
+library(PBSmapping)
+
+## Call in shp and raster files ##
+all<-readShapePoly("All_union.shp") #All Scatter-hoarders shp
+a<-raster("all.grd") #all scatter-hoarders raster
+rodents<-readShapePoly("Rodent_union.shp") #Rodent Scatter-hoarders shp
+r<-raster("rodent.grd") #rodent scatter-hoarders raster
+birds<-readShapePoly("Bird_union.shp") # Bird Scatter-hoarders shp
+b<-raster("bird.grd") #bird scatter-hoarders raster
+
+##Create color pallete for maps##
+colorRampPalette(c("#4575b4","#91bfdb","#fee090","#d73027")) #creates color pallete
+all$col<-rbpal(8)[as.numeric(cut(all$Join_Cou_2, breaks=8))] #break all color pallete into 8 
+rodents$col<-rbpal(10)[as.numeric(cut(rodents$Join_Count,breaks = 10))] #break rodent color pallete into 10
+birds$col<-rbpal(6)[as.numeric(cut(birds$Join_Count, breaks=6))] #break bird color pallete into 6 
+
+############NOTE#############
+#This is the ONLY reason I still have to call in the clunky shp files. I cannot figure out how to get the color pallete to work with the raster or without either raster or shp. If we can figure this out we can cut out the shp files and save ~5 mins of loading them
+###########END NOTE##########
+
+##Plot Maps##
+maps<-map("world", region=c("usa", "canada", "mexico"), xlim=c(-176, -53), ylim=c(25.5,85)) #creates "outline" map of North America
+
+plot(a, add=T, xlim=c(-170, -53), ylim=c(25.5,85), col=all$col, axis=F, legend=F) #maps all
+lines(maps) #puts US map over raster (looks better)
+legend(-170, 50, bty='n', cex=1, pch=15, col=rbpal(10), legend=c('1-3', '4-6', '7-9', '10-12', '13-15', '16-18', '19-21', '22-24'), title="All Scatter-hoarders") #creates legend
+
+plot(r, add=T, xlim=c(-170, -53), ylim=c(25.5,85), col=rodents$col, axis=F, legend=F) #maps rodents
+lines(maps) #puts US map over raster (looks better)
+legend(-175, 50, bty='n', cex=.9, pch=15, col=rbpal(10), legend=c('1-2', '3-4', '5-6', '7-8', '9-10', '11-12', '13-14', '15-16', '17-18', '19-20'), title="Scatter-hoarding Rodents") #creates legend
+
+plot(b, add=T, xlim=c(-170, -53), ylim=c(25.5,85), col=birds$col, axis=F, legend=F) #maps birds
+lines(maps) #puts US map over raster (looks better)
+legend(-175, 50, bty='n', cex=1.3, pch=15, col=rbpal(6), legend=c('1', '2', '3', '4', '5', '6'), title="Scatter-hoarding Birds") #creates legend
+
+
