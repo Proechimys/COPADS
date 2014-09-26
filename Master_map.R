@@ -5,7 +5,6 @@
 #                                                  #
 ####################################################
 
-
 ## Necessary Libraries ##
 library(maptools)
 library(raster)
